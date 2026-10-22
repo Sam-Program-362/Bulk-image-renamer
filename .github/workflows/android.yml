@@ -77,7 +77,9 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           log = Path("gradle-build.log")
-          tail = log.read_text(errors="replace")[-6000:] if log.exists() else "no gradle log"
+          text = log.read_text(errors="replace") if log.exists() else "no gradle log"
+          i = text.rfind("* What went wrong")
+          tail = (text[i:i + 5500] if i >= 0 else text[-5500:])
           print("::error title=Gradle build failed::" + tail.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A"))
           PY
 
