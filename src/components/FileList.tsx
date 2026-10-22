@@ -1,5 +1,5 @@
 import type { FileItem } from '../types';
-import { formatBytes, isImageFile } from '../types';
+import { formatBytes, isImageFile, isVideoFile } from '../types';
 import {
   AlertIcon,
   ArrowRightIcon,
@@ -144,7 +144,15 @@ export function FileList({
 
                 {/* Thumbnail */}
                 <div className="shrink-0 h-11 w-11 rounded-xl overflow-hidden bg-black/40 border border-white/10 flex items-center justify-center">
-                  {file.previewUrl ? (
+                  {file.previewUrl && isVideoFile(file.originalName, file.type) ? (
+                    <video
+                      src={file.previewUrl}
+                      className="h-full w-full object-cover"
+                      muted
+                      playsInline
+                      preload="metadata"
+                    />
+                  ) : file.previewUrl ? (
                     <img
                       src={file.previewUrl}
                       alt=""

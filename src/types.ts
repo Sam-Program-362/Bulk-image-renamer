@@ -85,6 +85,21 @@ export const IMAGE_EXTENSIONS = new Set([
   'jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg', 'heic', 'heif', 'avif', 'tiff', 'tif', 'ico',
 ]);
 
+export const VIDEO_EXTENSIONS = new Set([
+  'mp4', 'mov', 'mkv', 'webm', 'avi', '3gp', 'm4v',
+]);
+
+export function isVideoFile(name: string, type?: string): boolean {
+  if (type?.startsWith('video/')) return true;
+  const ext = name.split('.').pop()?.toLowerCase() ?? '';
+  return VIDEO_EXTENSIONS.has(ext);
+}
+
+/** Images + videos (incl. GIF) — what the bulk renamer can queue. */
+export function isMediaFile(name: string, type?: string): boolean {
+  return isImageFile(name, type) || isVideoFile(name, type);
+}
+
 export function isImageFile(name: string, type?: string): boolean {
   if (type?.startsWith('image/')) return true;
   const ext = name.split('.').pop()?.toLowerCase() ?? '';

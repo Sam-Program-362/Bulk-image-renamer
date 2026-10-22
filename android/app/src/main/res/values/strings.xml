@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Bulk Rename</string>
+    <string name="title_activity_main">Bulk Rename</string>
+    <string name="package_name">com.bulkrenamer.app</string>
+    <string name="custom_url_scheme">com.bulkrenamer.app</string>
+</resources>
