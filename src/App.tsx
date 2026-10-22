@@ -1,4 +1,5 @@
 import { ActionBar } from './components/ActionBar';
+import { DeviceSearch } from './components/DeviceSearch';
 import { FileDropZone } from './components/FileDropZone';
 import { FileList } from './components/FileList';
 import { RenamePanel } from './components/RenamePanel';
@@ -120,6 +121,8 @@ export default function App() {
         <main className="space-y-4 sm:space-y-5">
           <FileDropZone onFiles={addFiles} hasFiles={hasFiles} />
 
+          <DeviceSearch onFiles={addFiles} />
+
           {hasFiles && (
             <>
               <RenamePanel settings={settings} onChange={updateSettings} />
@@ -160,8 +163,7 @@ export default function App() {
                     1
                   </span>
                   <span>
-                    Tap <strong className="text-white/90">Pick folder</strong> and
-                    choose your Camera or Download album (Chrome supports folder access).
+                    In the Android app, use <strong className="text-white/90">Search on this device</strong> to find photos & videos by title — or tap Pick folder and choose your Camera or Download album.
                   </span>
                 </li>
                 <li className="flex gap-3">

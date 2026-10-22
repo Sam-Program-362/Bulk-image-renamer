@@ -1,0 +1,16 @@
+node_modules/
+dist/
+*.local
+.DS_Store
+
+# Android / Gradle (generated sources under android/ stay committed)
+.gradle/
+android/app/build/
+android/build/
+android/capacitor-cordova-android-plugins/build/
+*.apk
+*.aab
+*.keystore
+*.jks
+keystore.properties
+local.properties

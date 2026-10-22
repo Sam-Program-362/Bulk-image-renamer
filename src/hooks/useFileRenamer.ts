@@ -7,6 +7,7 @@ import {
   formatBytes,
   getExtension,
   isImageFile,
+  isMediaFile,
 } from '../types';
 import { applyRenameRules, detectConflicts } from '../utils/renameEngine';
 
@@ -31,9 +32,9 @@ export function useFileRenamer() {
       if (sourceFolder) setFolderName(sourceFolder);
 
       const mapped: FileItem[] = list.map((file) => {
-        const isImg = isImageFile(file.name, file.type);
+        const isMedia = isMediaFile(file.name, file.type);
         let previewUrl: string | undefined;
-        if (isImg && file.size < 8 * 1024 * 1024) {
+        if (isMedia && file.size < 64 * 1024 * 1024) {
           try {
             previewUrl = URL.createObjectURL(file);
           } catch {
@@ -49,7 +50,7 @@ export function useFileRenamer() {
           size: file.size,
           type: file.type || 'unknown',
           previewUrl,
-          selected: settings.onlyImages ? isImg : true,
+          selected: settings.onlyImages ? isMedia : true,
           status: 'pending' as const,
         };
       });
@@ -97,7 +98,7 @@ export function useFileRenamer() {
       prev.map((f) => ({
         ...f,
         selected: imagesOnly
-          ? value && isImageFile(f.originalName, f.type)
+          ? value && isMediaFile(f.originalName, f.type)
           : value,
       }))
     );
@@ -120,7 +121,7 @@ export function useFileRenamer() {
   const filteredFiles = useMemo(() => {
     let list = previewedFiles;
     if (filterImagesOnly) {
-      list = list.filter((f) => isImageFile(f.originalName, f.type));
+      list = list.filter((f) => isMediaFile(f.originalName, f.type));
     }
     if (search.trim()) {
       const q = search.toLowerCase();

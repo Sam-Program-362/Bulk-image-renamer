@@ -6,9 +6,13 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "android:sync": "npm run build && cap sync android",
+    "android:open": "cap open android",
+    "android:run": "npm run android:sync && cap run android"
   },
   "dependencies": {
+    "@capacitor/core": "^7.6.9",
     "clsx": "2.1.1",
     "file-saver": "^2.0.5",
     "jszip": "^3.10.2",
@@ -17,6 +21,8 @@
     "tailwind-merge": "3.4.0"
   },
   "devDependencies": {
+    "@capacitor/android": "^7.6.9",
+    "@capacitor/cli": "^7.6.9",
     "@tailwindcss/vite": "4.1.17",
     "@types/file-saver": "^2.0.7",
     "@types/node": "22.19.17",
