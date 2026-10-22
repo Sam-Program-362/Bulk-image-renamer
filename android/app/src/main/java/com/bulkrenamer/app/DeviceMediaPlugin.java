@@ -221,7 +221,8 @@ public class DeviceMediaPlugin extends Plugin {
             for (int i = 0; i < mimeTypes.length(); i++) {
                 if (i > 0) placeholders.append(", ");
                 placeholders.append("?");
-                args.add(mimeTypes.getString(i));
+                String mime = mimeTypes.optString(i, "");
+                if (!mime.isEmpty()) args.add(mime);
             }
             selectionParts.add(MediaStore.Files.FileColumns.MIME_TYPE + " IN (" + placeholders + ")");
         }
