@@ -71,6 +71,29 @@ const FILTER_MIME_TYPES: Record<MediaFilter, string[] | undefined> = {
   mp4: ['video/mp4'],
 };
 
+/** Extra metadata shown in Management mode's Info view. */
+export interface DeviceMediaDetails extends DeviceMediaItem {
+  /** Milliseconds since epoch. */
+  dateAdded: number;
+  /** Album / bucket name, e.g. "Camera". */
+  album?: string | null;
+  /** Folder inside shared storage, e.g. "DCIM/Camera/" (API 29+). */
+  relativePath?: string | null;
+  /** Absolute path when exposed by the OS (often null on Android 10+). */
+  path?: string | null;
+}
+
+export type CopyDestination = 'library' | 'download' | 'same';
+
+export interface CopyResult {
+  copied: boolean;
+  moved: boolean;
+  destination: CopyDestination;
+  item: { id: string; displayName: string };
+  /** Set when a move copied the file but kept the original. */
+  warning?: string;
+}
+
 interface DeviceMediaPlugin {
   search(options: {
     query?: string;
@@ -79,6 +102,16 @@ interface DeviceMediaPlugin {
   }): Promise<{ items: DeviceMediaItem[]; count: number }>;
   stageFiles(options: { ids: string[] }): Promise<{ files: StagedFile[] }>;
   checkPermission(): Promise<{ granted: boolean }>;
+  // Management mode
+  getDetails(options: { id: string }): Promise<DeviceMediaDetails>;
+  openWith(options: { id: string }): Promise<void>;
+  renameItem(options: { id: string; newName: string }): Promise<{ id: string; displayName: string }>;
+  deleteItem(options: { id: string }): Promise<{ id: string; deleted: boolean }>;
+  copyItem(options: {
+    id: string;
+    destination: CopyDestination;
+    move?: boolean;
+  }): Promise<CopyResult>;
 }
 
 const DeviceMedia = registerPlugin<DeviceMediaPlugin>('DeviceMedia');
@@ -131,4 +164,45 @@ export async function loadDeviceFiles(items: DeviceMediaItem[]): Promise<File[]>
     );
   }
   return loaded;
+}
+
+// ------------------------------------------------------- management mode
+
+/** Full info for one device item (album, path, dates, dimensions…). */
+export function getDeviceMediaDetails(item: DeviceMediaItem): Promise<DeviceMediaDetails> {
+  return DeviceMedia.getDetails({ id: item.id });
+}
+
+/** Open the item in an external gallery / video-player app. */
+export function openDeviceMedia(item: DeviceMediaItem): Promise<void> {
+  return DeviceMedia.openWith({ id: item.id });
+}
+
+/**
+ * Rename one item in place on the device. On Android 10+, renaming a file
+ * owned by another app pops a system approval dialog (handled natively).
+ */
+export function renameDeviceMedia(
+  item: DeviceMediaItem,
+  newName: string
+): Promise<{ id: string; displayName: string }> {
+  return DeviceMedia.renameItem({ id: item.id, newName });
+}
+
+/** Delete one item from the device (system approval dialog when required). */
+export function deleteDeviceMedia(item: DeviceMediaItem): Promise<{ id: string; deleted: boolean }> {
+  return DeviceMedia.deleteItem({ id: item.id });
+}
+
+/**
+ * Copy an item to another album, or move it (copy + delete original).
+ * Destinations: "library" = Pictures/Movies › Bulk Rename,
+ * "download" = Download › Bulk Rename, "same" = its current folder.
+ */
+export function copyDeviceMedia(
+  item: DeviceMediaItem,
+  destination: CopyDestination,
+  move = false
+): Promise<CopyResult> {
+  return DeviceMedia.copyItem({ id: item.id, destination, move });
 }

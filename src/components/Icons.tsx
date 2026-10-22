@@ -172,3 +172,51 @@ export function PlusIcon(p: IconProps) {
     </svg>
   );
 }
+
+export function EyeIcon(p: IconProps) {
+  return (
+    <svg {...base(p)}>
+      <path d="M2.1 12.3a1 1 0 0 1 0-.6C3.6 6.9 7.5 4 12 4s8.4 2.9 9.9 7.7a1 1 0 0 1 0 .6C20.4 17.1 16.5 20 12 20s-8.4-2.9-9.9-7.7Z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  );
+}
+
+export function InfoIcon(p: IconProps) {
+  return (
+    <svg {...base(p)}>
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 16v-4" />
+      <path d="M12 8h.01" />
+    </svg>
+  );
+}
+
+export function CopyIcon(p: IconProps) {
+  return (
+    <svg {...base(p)}>
+      <rect x="9" y="9" width="13" height="13" rx="2" />
+      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+    </svg>
+  );
+}
+
+export function MoveIcon(p: IconProps) {
+  return (
+    <svg {...base(p)}>
+      <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.7-.9l-.8-1.2A2 2 0 0 0 8 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" />
+      <path d="m12 10v6" />
+      <path d="m9.5 13.5 2.5 2.5 2.5-2.5" />
+    </svg>
+  );
+}
+
+export function ExternalIcon(p: IconProps) {
+  return (
+    <svg {...base(p)}>
+      <path d="M15 3h6v6" />
+      <path d="M10 14 21 3" />
+      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+    </svg>
+  );
+}

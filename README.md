@@ -20,6 +20,13 @@ Files are never uploaded anywhere — everything happens on your device.
   on the phone by title / file name (`IMG_…`, `paris trip`, …), filter by
   type — All media, Images, GIF, JPG, PNG, WEBP, Videos, MP4 — preview them
   in a grid, select any of them, and drop them straight into the rename queue.
+- **Android only — Management mode:** the device search doubles as a file
+  manager. Tap any found item to **view** it full-screen (or open it in
+  another app), see full **info** (size, dimensions, duration, album, folder,
+  dates), **rename** it in place, **copy / move** it (Bulk Rename album,
+  Downloads, or same folder), or **delete** it. Renaming/deleting files owned
+  by other apps triggers Android's system approval dialog; originals are
+  otherwise modified in place — no copies in the app cache.
 
 ## Web
 
@@ -107,7 +114,8 @@ src/                    Web app (shared by web + Android)
 android/                Capacitor Android project
   app/src/main/java/com/bulkrenamer/app/
     MainActivity.java        registers the plugin
-    DeviceMediaPlugin.java   MediaStore search + file staging
+    DeviceMediaPlugin.java   MediaStore search + staging + management
+                             (details, open, rename, copy/move, delete)
 capacitor.config.ts
 .github/workflows/      CI (web) + Android APK build/release
 ```
