@@ -8,7 +8,9 @@ import {
   type DeviceMediaItem,
   type MediaFilter,
 } from '../native/deviceMedia';
-import { CheckIcon, ImageIcon, PlusIcon, SearchIcon } from './Icons';
+import { CheckIcon, ImageIcon, PlusIcon, SearchIcon, SettingsIcon } from './Icons';
+import { ManageSheet } from './ManageSheet';
+import { MediaViewer } from './MediaViewer';
 
 interface Props {
   /** Adds loaded files to the rename queue (same as picking them). */
@@ -37,6 +39,12 @@ export function DeviceSearch({ onFiles }: Props) {
   const [results, setResults] = useState<DeviceMediaItem[] | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [searching, setSearching] = useState(false);
+  // 'select' = pick items for the bulk-rename queue; 'manage' = tap an item
+  // to view / inspect / rename / copy / move / delete it on the device.
+  const [mode, setMode] = useState<'select' | 'manage'>('select');
+  const [manageItem, setManageItem] = useState<DeviceMediaItem | null>(null);
+  const [viewingItem, setViewingItem] = useState<DeviceMediaItem | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const debounce = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -118,8 +126,34 @@ export function DeviceSearch({ onFiles }: Props) {
         </div>
         <p className="text-xs text-white/45">
           Find images, GIFs and videos (JPG, PNG, MP4, …) anywhere on your
-          phone by title — then rename them in bulk.
+          phone by title — rename them in bulk, or manage files in place.
         </p>
+
+        <div className="grid grid-cols-2 gap-1 rounded-2xl border border-white/10 bg-black/30 p-1">
+          {(
+            [
+              { id: 'select', label: 'Bulk select', desc: 'Add to rename queue' },
+              { id: 'manage', label: 'Management', desc: 'View · rename · delete…' },
+            ] as const
+          ).map((m) => (
+            <button
+              key={m.id}
+              type="button"
+              onClick={() => setMode(m.id)}
+              className={`rounded-xl px-3 py-2 text-left transition ${
+                mode === m.id ? 'bg-emerald-500 text-white' : 'text-white/55'
+              }`}
+            >
+              <span className="flex items-center gap-1.5 text-xs font-bold">
+                {m.id === 'manage' && <SettingsIcon size={13} />}
+                {m.label}
+              </span>
+              <span className={`block text-[10px] ${mode === m.id ? 'text-white/75' : 'text-white/35'}`}>
+                {m.desc}
+              </span>
+            </button>
+          ))}
+        </div>
 
         <div className="relative">
           <SearchIcon
@@ -158,6 +192,16 @@ export function DeviceSearch({ onFiles }: Props) {
         </p>
       )}
 
+      {notice && (
+        <div className="flex items-center gap-2 px-4 py-3 text-xs text-emerald-300 bg-emerald-500/10 border-b border-emerald-400/20">
+          <CheckIcon size={14} className="shrink-0" />
+          <p className="min-w-0 flex-1">{notice}</p>
+          <button type="button" onClick={() => setNotice(null)} className="shrink-0 font-bold text-emerald-200">
+            ✕
+          </button>
+        </div>
+      )}
+
       <div className="max-h-[46vh] overflow-y-auto overscroll-contain">
         {searching && results === null ? (
           <p className="px-4 py-10 text-center text-sm text-white/40">Searching device…</p>
@@ -170,12 +214,12 @@ export function DeviceSearch({ onFiles }: Props) {
         ) : (
           <div className="grid grid-cols-3 sm:grid-cols-4 gap-1.5 p-2">
             {(results ?? []).map((item) => {
-              const isSelected = selected.has(item.id);
+              const isSelected = mode === 'select' && selected.has(item.id);
               return (
                 <button
                   key={item.id}
                   type="button"
-                  onClick={() => toggle(item.id)}
+                  onClick={() => (mode === 'manage' ? setManageItem(item) : toggle(item.id))}
                   className={`relative aspect-square rounded-xl overflow-hidden border text-left transition ${
                     isSelected
                       ? 'border-emerald-400 ring-2 ring-emerald-400/60'
@@ -208,15 +252,21 @@ export function DeviceSearch({ onFiles }: Props) {
                       GIF
                     </span>
                   )}
-                  <span
-                    className={`absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-md border ${
-                      isSelected
-                        ? 'bg-emerald-500 border-emerald-400 text-white'
-                        : 'border-white/40 bg-black/40'
-                    }`}
-                  >
-                    {isSelected && <CheckIcon size={12} />}
-                  </span>
+                  {mode === 'select' ? (
+                    <span
+                      className={`absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-md border ${
+                        isSelected
+                          ? 'bg-emerald-500 border-emerald-400 text-white'
+                          : 'border-white/40 bg-black/40'
+                      }`}
+                    >
+                      {isSelected && <CheckIcon size={12} />}
+                    </span>
+                  ) : (
+                    <span className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-md border border-white/40 bg-black/50 text-[10px] text-white">
+                      ⋯
+                    </span>
+                  )}
                   <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent px-1.5 pt-4 pb-1">
                     <span className="block truncate text-[10px] font-medium text-white">
                       {item.displayName}
@@ -232,7 +282,13 @@ export function DeviceSearch({ onFiles }: Props) {
         )}
       </div>
 
-      {selected.size > 0 && (
+      {mode === 'manage' && results !== null && results.length > 0 && (
+        <p className="px-4 py-2.5 border-t border-white/10 bg-white/5 text-center text-[11px] text-white/40">
+          Tap any item to view, inspect, rename, copy, move or delete it
+        </p>
+      )}
+
+      {mode === 'select' && selected.size > 0 && (
         <div className="px-4 py-3 border-t border-white/10 bg-white/5">
           <button
             type="button"
@@ -247,6 +303,24 @@ export function DeviceSearch({ onFiles }: Props) {
           </button>
         </div>
       )}
+
+      {manageItem && (
+        <ManageSheet
+          item={manageItem}
+          onClose={() => setManageItem(null)}
+          onView={(item) => {
+            setManageItem(null);
+            setViewingItem(item);
+          }}
+          onChanged={(message) => {
+            setManageItem(null);
+            setNotice(message);
+            void runSearch(query, filter);
+          }}
+        />
+      )}
+
+      <MediaViewer item={viewingItem} onClose={() => setViewingItem(null)} />
     </section>
   );
 }
